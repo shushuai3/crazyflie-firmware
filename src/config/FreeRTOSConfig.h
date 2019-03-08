@@ -74,7 +74,8 @@
 #define configUSE_IDLE_HOOK			1
 #define configUSE_TICK_HOOK			0
 #define configCPU_CLOCK_HZ			( ( unsigned long ) FREERTOS_MCU_CLOCK_HZ )
-#define configTICK_RATE_HZ			( ( portTickType ) 1000 )
+#define configTICK_RATE_HZ_RAW  1000
+#define configTICK_RATE_HZ			( ( portTickType ) configTICK_RATE_HZ_RAW )
 #define configMINIMAL_STACK_SIZE	( ( unsigned short ) FREERTOS_MIN_STACK_SIZE )
 #define configTOTAL_HEAP_SIZE		( ( size_t ) ( FREERTOS_HEAP_SIZE ) )
 #define configMAX_TASK_NAME_LEN		( 10 )
@@ -90,7 +91,7 @@
 #define configTIMER_TASK_PRIORITY 1
 #define configTIMER_QUEUE_LENGTH  20
 #define configUSE_MALLOC_FAILED_HOOK 1
-#define configTIMER_TASK_STACK_DEPTH (configMINIMAL_STACK_SIZE * 2)
+#define configTIMER_TASK_STACK_DEPTH (configMINIMAL_STACK_SIZE * 4)
 
 #define configMAX_PRIORITIES		( 6 )
 #define configMAX_CO_ROUTINE_PRIORITIES ( 2 )
@@ -120,8 +121,13 @@ to exclude the API function. */
 #define vPortSVCHandler SVC_Handler
 
 //Milliseconds to OS Ticks
-#define M2T(X) ((unsigned int)((X)*(configTICK_RATE_HZ/1000.0)))
+#if configTICK_RATE_HZ_RAW != 1000
+  #error "Please review the use of M2T and T2M if there is not a 1 to 1 mapping between ticks and milliseconds"
+#endif
+#define M2T(X) ((unsigned int)(X))
 #define F2T(X) ((unsigned int)((configTICK_RATE_HZ/(X))))
+#define T2M(X) ((unsigned int)(X))
+
 
 // DEBUG SECTION
 #define configUSE_APPLICATION_TASK_TAG  1
